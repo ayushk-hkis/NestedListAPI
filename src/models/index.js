@@ -1,6 +1,6 @@
 'use strict'
 const { Sequelize, Model, DataTypes } = require('sequelize')
-const { development } = require('../config/config.json')
+const { development } = require('../db/config/config.json')
 var db = {}
 
 const sequelize = new Sequelize(development.database, development.username, development.password, {

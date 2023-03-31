@@ -1,4 +1,5 @@
 const List = require('../models/list')
+const { ResCode, messages } = require('../utils/response')
 
 exports.getList = async (req, res) => {
     try {
@@ -50,11 +51,11 @@ exports.getList = async (req, res) => {
             return main
         }
 
-        return res.status(200).json({ Status: 200, Message: 'List Data', Data: filter(finalData) })
+        return res.status(ResCode.SUCCESS).json({ status: ResCode.SUCCESS, message: messages.LIST_DATA, data: filter(finalData) })
     } catch (error) {
         console.log(error)
 
-        return res.status(500).json({ Status: 500, Message: 'Something Went Wrong!' })
+        return res.status(ResCode.SERVER_ERROR).json({ status: ResCode.SERVER_ERROR, message: messages.INTERNAL_SERVER_ERROR })
     }
 }
 
@@ -67,15 +68,19 @@ exports.addList = async (req, res) => {
         }
 
         if (id) {
+            const user = await List.findByPk(id)
+            if (!user) {
+                return res.status(ResCode.NOT_FOUND).json({ status: ResCode.NOT_FOUND, message: messages.NOT_FOUND })
+            }
             addElem.parent = id
         }
 
         const addList = await List.create(addElem)
-        return res.status(201).json({ Status: 201, Message: 'List element added Successdfully!', Data: addList })
+        return res.status(ResCode.CREATED).json({ status: ResCode.CREATED, message: messages.ELEMENT_ADDED, data: addList })
     } catch (error) {
         console.log(error)
 
-        return res.status(500).json({ Status: 500, Message: 'Something Went Wrong!' })
+        return res.status(ResCode.SERVER_ERROR).json({ status: ResCode.SERVER_ERROR, message: messages.INTERNAL_SERVER_ERROR })
     }
 }
 
@@ -86,17 +91,17 @@ exports.updateList = async (req, res) => {
         const listItem = await List.findByPk(id)
 
         if (!listItem) {
-            return res.status(404).json({ Status: 404, Message: 'List Element Not Found!!' })
+            return res.status(ResCode.NOT_FOUND).json({ status: ResCode.NOT_FOUND, message: messages.NOT_FOUND })
         }
 
         const updateElem = { title }
         await List.update(updateElem, { where: { id } })
 
-        return res.status(201).json({ Status: 201, Message: 'Element Updated Successfully!!', Data: await List.findByPk(id) })
+        return res.status(ResCode.CREATED).json({ status: ResCode.CREATED, message: messages.ELEMENT_UPDATED, data: await List.findByPk(id) })
     } catch (error) {
         console.log(error)
 
-        return res.status(500).json({ Status: 500, Message: 'Something Went Wrong!' })
+        return res.status(ResCode.SERVER_ERROR).json({ status: ResCode.SERVER_ERROR, message: messages.INTERNAL_SERVER_ERROR })
     }
 }
 
@@ -106,13 +111,13 @@ exports.deleteList = async (req, res) => {
         const del = await List.destroy({ where: { id } })
 
         if (!del) {
-            return res.status(404).json({ Status: 404, Message: 'List Element Not Found!!' })
+            return res.status(ResCode.NOT_FOUND).json({ status: ResCode.NOT_FOUND, message: messages.NOT_FOUND })
         }
 
-        return res.status(200).json({ Status: 200, Message: 'Element Deleted Successfully!' })
+        return res.status(ResCode.SUCCESS).json({ status: ResCode.SUCCESS, message: messages.ELEMENT_DELETED })
     } catch (error) {
         console.log(error)
 
-        return res.status(500).json({ Status: 500, Message: 'Something Went Wrong!' })
+        return res.status(ResCode.SERVER_ERROR).json({ status: ResCode.SERVER_ERROR, message: messages.INTERNAL_SERVER_ERROR })
     }
 }

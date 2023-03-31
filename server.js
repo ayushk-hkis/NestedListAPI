@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const listRoutes = require('./routes/ListRoute')
+const listRoutes = require('./src/routes/list')
 const app = express()
 const PORT = process.env.PORT || 2001
 
