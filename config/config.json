@@ -1,0 +1,10 @@
+{
+  "development": {
+    "username": "root",
+    "password": null,
+    "database": "node_nested",
+    "host": "localhost",
+    "dialect": "mysql",
+    "port":"3306"
+  }
+}
