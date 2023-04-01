@@ -108,11 +108,22 @@ exports.updateList = async (req, res) => {
 exports.deleteList = async (req, res) => {
     try {
         const id = req.params.id
-        const del = await List.destroy({ where: { id } })
+        const item = await List.findByPk(id);
 
-        if (!del) {
-            return res.status(ResCode.NOT_FOUND).json({ status: ResCode.NOT_FOUND, message: messages.NOT_FOUND })
+        if (!item) {
+            return res.status(ResCode.NOT_FOUND).json({ status: ResCode.NOT_FOUND, message: messages.NOT_FOUND });
         }
+
+        const deleteChildItems = async (parentId) => {
+            const children = await List.findAll({ where: { parent: parentId } })
+            for (const child of children) {
+                await deleteChildItems(child.id)
+            }
+            await List.destroy({ where: { parent: parentId } })
+        }
+        await deleteChildItems(id)
+
+        await item.destroy()
 
         return res.status(ResCode.SUCCESS).json({ status: ResCode.SUCCESS, message: messages.ELEMENT_DELETED })
     } catch (error) {
